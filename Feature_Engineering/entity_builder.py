@@ -8,12 +8,18 @@ Dynamically builds EntitySets with:
 - Multi-domain support
 """
 
-import featuretools as ft
 import pandas as pd
 import numpy as np
 from typing import Dict, List, Optional, Any, Tuple
 import logging
 from datetime import datetime
+
+try:
+    import featuretools as ft
+    FEATURETOOLS_AVAILABLE = True
+except ImportError:
+    FEATURETOOLS_AVAILABLE = False
+    ft = None
 
 from .schema_analyzer import SchemaAnalyzer, RelationshipDetector
 
@@ -35,7 +41,7 @@ class EntityBuilder:
     def build_entityset(self, 
                        dataframes: Dict[str, pd.DataFrame],
                        name: str = "entityset",
-                       entity_config: Optional[Dict[str, Any]] = None) -> ft.EntitySet:
+                       entity_config: Optional[Dict[str, Any]] = None) -> Any:
         """
         Build a Featuretools EntitySet from multiple dataframes.
         
@@ -47,6 +53,12 @@ class EntityBuilder:
         Returns:
             Featuretools EntitySet
         """
+        if not FEATURETOOLS_AVAILABLE:
+            raise ImportError(
+                "featuretools is required for build_entityset. "
+                "Install with: pip install featuretools"
+            )
+            
         logger.info(f"Building EntitySet '{name}' from {len(dataframes)} dataframes")
         
         # Analyze schemas first
@@ -135,7 +147,7 @@ class EntityBuilder:
                                 df: pd.DataFrame,
                                 entity_name: str = "data",
                                 index_col: Optional[str] = None,
-                                time_col: Optional[str] = None) -> ft.EntitySet:
+                                time_col: Optional[str] = None) -> Any:
         """
         Build EntitySet from a single table (no relationships).
         
@@ -148,6 +160,12 @@ class EntityBuilder:
         Returns:
             Featuretools EntitySet
         """
+        if not FEATURETOOLS_AVAILABLE:
+            raise ImportError(
+                "featuretools is required for build_from_single_table. "
+                "Install with: pip install featuretools"
+            )
+            
         logger.info(f"Building single-table EntitySet '{entity_name}'")
         
         # Analyze schema if index/time not provided
@@ -176,7 +194,7 @@ class EntityBuilder:
         self.entitysets[entity_name] = es
         return es
     
-    def get_entityset(self, name: str) -> Optional[ft.EntitySet]:
+    def get_entityset(self, name: str) -> Optional[Any]:
         """Get an EntitySet by name."""
         return self.entitysets.get(name)
     
@@ -197,8 +215,14 @@ class EntityBuilder:
         combined_schema = {'columns': {col: {} for col in all_columns}}
         return self.schema_analyzer.detect_domain(combined_schema)
     
-    def export_entityset_info(self, es: ft.EntitySet) -> Dict[str, Any]:
+    def export_entityset_info(self, es: Any) -> Dict[str, Any]:
         """Export EntitySet metadata for documentation."""
+        if not FEATURETOOLS_AVAILABLE:
+            raise ImportError(
+                "featuretools is required for export_entityset_info. "
+                "Install with: pip install featuretools"
+            )
+            
         info = {
             'id': es.id,
             'entities': [],

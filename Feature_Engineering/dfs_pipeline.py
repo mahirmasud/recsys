@@ -8,16 +8,24 @@ Implements automated feature generation with:
 - Scalable DFS execution
 """
 
-import featuretools as ft
-from featuretools.primitives import (
-    Sum, Mean, Count, Std, Max, Min, Mode, NumUnique,
-    PercentTrue, NMostCommon, TimeSincePrevious, TimeSince
-)
 import pandas as pd
 import numpy as np
 from typing import Dict, List, Optional, Any, Tuple, Union
 import logging
 from datetime import datetime
+
+try:
+    import featuretools as ft
+    from featuretools.primitives import (
+        Sum, Mean, Count, Std, Max, Min, Mode, NumUnique,
+        PercentTrue, NMostCommon, TimeSincePrevious, TimeSince
+    )
+    FEATURETOOLS_AVAILABLE = True
+except ImportError:
+    FEATURETOOLS_AVAILABLE = False
+    ft = None
+    Sum = Mean = Count = Std = Max = Min = Mode = NumUnique = None
+    PercentTrue = NMostCommon = TimeSincePrevious = TimeSince = None
 
 from .primitive_registry import PrimitiveRegistry, primitive_registry
 from .cutoff_manager import CutoffManager
@@ -38,7 +46,7 @@ class DFSPipeline:
         logger.info("DFSPipeline initialized")
     
     def run_dfs(self,
-                entityset: ft.EntitySet,
+                entityset: Any,
                 target_dataframe_name: str,
                 target_column: Optional[str] = None,
                 max_depth: int = 2,
@@ -68,6 +76,12 @@ class DFSPipeline:
         Returns:
             Tuple of (feature_matrix, feature_definitions)
         """
+        if not FEATURETOOLS_AVAILABLE:
+            raise ImportError(
+                "featuretools is required for run_dfs. "
+                "Install with: pip install featuretools"
+            )
+            
         logger.info(f"Running DFS on '{target_dataframe_name}' with max_depth={max_depth}")
         
         # Get domain-specific primitives if not specified
@@ -159,7 +173,7 @@ class DFSPipeline:
         return resolved
     
     def run_dfs_with_cutoffs(self,
-                            entityset: ft.EntitySet,
+                            entityset: Any,
                             target_dataframe_name: str,
                             instances: Optional[List] = None,
                             cutoff_times: Optional[Union[pd.DataFrame, List]] = None,
@@ -179,6 +193,12 @@ class DFSPipeline:
         Returns:
             Feature matrix
         """
+        if not FEATURETOOLS_AVAILABLE:
+            raise ImportError(
+                "featuretools is required for run_dfs_with_cutoffs. "
+                "Install with: pip install featuretools"
+            )
+                
         logger.info("Running DFS with cutoff times")
         
         # Build cutoff time dataframe if needed
