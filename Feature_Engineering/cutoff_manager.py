@@ -13,6 +13,13 @@ from typing import Dict, List, Optional, Any, Union
 import logging
 from datetime import datetime, timedelta
 
+try:
+    import featuretools as ft
+    FEATURETOOLS_AVAILABLE = True
+except ImportError:
+    FEATURETOOLS_AVAILABLE = False
+    ft = None
+
 logger = logging.getLogger(__name__)
 
 
@@ -183,7 +190,7 @@ class CutoffManager:
         return cutoffs_list
     
     def validate_cutoff_safety(self,
-                               entityset: ft.EntitySet,
+                               entityset: Any,
                                cutoff_df: pd.DataFrame,
                                target_dataframe_name: str,
                                time_column: str) -> Dict[str, Any]:
@@ -199,7 +206,11 @@ class CutoffManager:
         Returns:
             Validation report dictionary
         """
-        import featuretools as ft
+        if not FEATURETOOLS_AVAILABLE:
+            raise ImportError(
+                "featuretools is required for validate_cutoff_safety. "
+                "Install with: pip install featuretools"
+            )
         
         validation = {
             'is_safe': True,

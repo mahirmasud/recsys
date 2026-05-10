@@ -4,32 +4,49 @@ Primitive Registry - Custom Featuretools primitives for multi-domain feature eng
 Registers custom aggregation and transformation primitives that work across domains.
 """
 
-import featuretools as ft
-from featuretools.primitives import AggregationPrimitive, TransformPrimitive
-from woodwork.column_schema import ColumnSchema
-from woodwork.logical_types import Categorical, Datetime
 import pandas as pd
 import numpy as np
 from typing import Optional, List, Dict, Any
 import logging
 
+try:
+    import featuretools as ft
+    from featuretools.primitives import AggregationPrimitive, TransformPrimitive
+    from woodwork.column_schema import ColumnSchema
+    from woodwork.logical_types import Categorical, Datetime
+    FEATURETOOLS_AVAILABLE = True
+except ImportError:
+    FEATURETOOLS_AVAILABLE = False
+    ft = None
+    AggregationPrimitive = object
+    TransformPrimitive = object
+    ColumnSchema = None
+    Categorical = Datetime = None
+
 logger = logging.getLogger(__name__)
 
 
-class RecencyScorePrimitive(AggregationPrimitive):
+class RecencyScorePrimitive:
     """
     Calculates recency score based on time since last event.
     
     Lower recency (more recent) = higher score
     """
     name = "recency_score"
-    input_types = [ColumnSchema(semantic_tags={'datetime'})]
-    return_type = ColumnSchema(semantic_tags={'numeric'})
-    stack_on_self = False
+    
+    if FEATURETOOLS_AVAILABLE:
+        if FEATURETOOLS_AVAILABLE:
+            input_types = [ColumnSchema(semantic_tags={'datetime'})]
+        if FEATURETOOLS_AVAILABLE:
+            return_type = ColumnSchema(semantic_tags={'numeric'})
+        if FEATURETOOLS_AVAILABLE:
+            stack_on_self = False
     
     def __init__(self, reference_date=None):
+    def __init__(self, reference_date=None):
         self.reference_date = reference_date or pd.Timestamp.now()
-        super().__init__()
+        if FEATURETOOLS_AVAILABLE:
+            super().__init__()
     
     def get_function(self):
         def recency_score(timestamps):
@@ -43,15 +60,19 @@ class RecencyScorePrimitive(AggregationPrimitive):
         return recency_score
 
 
-class FrequencyScorePrimitive(AggregationPrimitive):
+class FrequencyScorePrimitive:
     """
     Calculates frequency score based on event count.
     """
     name = "frequency_score"
-    input_types = [ColumnSchema(semantic_tags={'numeric'})]
-    return_type = ColumnSchema(semantic_tags={'numeric'})
-    stack_on_self = False
+    if FEATURETOOLS_AVAILABLE:
+        input_types = [ColumnSchema(semantic_tags={'numeric'})]
+    if FEATURETOOLS_AVAILABLE:
+        return_type = ColumnSchema(semantic_tags={'numeric'})
+    if FEATURETOOLS_AVAILABLE:
+        stack_on_self = False
     
+    def get_function(self):
     def get_function(self):
         def frequency_score(values):
             if len(values) == 0:
@@ -62,15 +83,19 @@ class FrequencyScorePrimitive(AggregationPrimitive):
         return frequency_score
 
 
-class TrendVelocityPrimitive(AggregationPrimitive):
+class TrendVelocityPrimitive:
     """
     Calculates trend velocity (rate of change over time).
     """
     name = "trend_velocity"
-    input_types = [ColumnSchema(semantic_tags={'numeric'}), ColumnSchema(semantic_tags={'datetime'})]
-    return_type = ColumnSchema(semantic_tags={'numeric'})
-    stack_on_self = False
+    if FEATURETOOLS_AVAILABLE:
+        input_types = [ColumnSchema(semantic_tags={'numeric'}), ColumnSchema(semantic_tags={'datetime'})]
+    if FEATURETOOLS_AVAILABLE:
+        return_type = ColumnSchema(semantic_tags={'numeric'})
+    if FEATURETOOLS_AVAILABLE:
+        stack_on_self = False
     
+    def get_function(self):
     def get_function(self):
         def trend_velocity(values, timestamps):
             if len(values) < 2 or len(timestamps) < 2:
@@ -94,15 +119,19 @@ class TrendVelocityPrimitive(AggregationPrimitive):
         return trend_velocity
 
 
-class EntityAffinityPrimitive(AggregationPrimitive):
+class EntityAffinityPrimitive:
     """
     Calculates affinity score for categorical entities.
     """
     name = "entity_affinity"
-    input_types = [ColumnSchema(logical_type=Categorical)]
-    return_type = ColumnSchema(semantic_tags={'numeric'})
-    stack_on_self = False
+    if FEATURETOOLS_AVAILABLE:
+        input_types = [ColumnSchema(logical_type=Categorical)]
+    if FEATURETOOLS_AVAILABLE:
+        return_type = ColumnSchema(semantic_tags={'numeric'})
+    if FEATURETOOLS_AVAILABLE:
+        stack_on_self = False
     
+    def get_function(self):
     def get_function(self):
         def entity_affinity(categories):
             if len(categories) == 0:
@@ -125,15 +154,19 @@ class EntityAffinityPrimitive(AggregationPrimitive):
         return entity_affinity
 
 
-class InteractionDensityPrimitive(AggregationPrimitive):
+class InteractionDensityPrimitive:
     """
     Calculates interaction density (events per time unit).
     """
     name = "interaction_density"
-    input_types = [ColumnSchema(semantic_tags={'datetime'})]
-    return_type = ColumnSchema(semantic_tags={'numeric'})
-    stack_on_self = False
+    if FEATURETOOLS_AVAILABLE:
+        input_types = [ColumnSchema(semantic_tags={'datetime'})]
+    if FEATURETOOLS_AVAILABLE:
+        return_type = ColumnSchema(semantic_tags={'numeric'})
+    if FEATURETOOLS_AVAILABLE:
+        stack_on_self = False
     
+    def get_function(self):
     def get_function(self):
         def interaction_density(timestamps):
             if len(timestamps) < 2:
@@ -148,15 +181,19 @@ class InteractionDensityPrimitive(AggregationPrimitive):
         return interaction_density
 
 
-class PercentileRankPrimitive(TransformPrimitive):
+class PercentileRankPrimitive:
     """
     Calculates percentile rank of a value within its group.
     """
     name = "percentile_rank"
-    input_types = [ColumnSchema(semantic_tags={'numeric'})]
-    return_type = ColumnSchema(semantic_tags={'numeric'})
-    stack_on_self = False
+    if FEATURETOOLS_AVAILABLE:
+        input_types = [ColumnSchema(semantic_tags={'numeric'})]
+    if FEATURETOOLS_AVAILABLE:
+        return_type = ColumnSchema(semantic_tags={'numeric'})
+    if FEATURETOOLS_AVAILABLE:
+        stack_on_self = False
     
+    def get_function(self):
     def get_function(self):
         def percentile_rank(values):
             if len(values) == 0:
@@ -167,15 +204,19 @@ class PercentileRankPrimitive(TransformPrimitive):
         return percentile_rank
 
 
-class RollingMeanPrimitive(AggregationPrimitive):
+class RollingMeanPrimitive:
     """
     Calculates rolling mean over a window.
     """
     name = "rolling_mean"
-    input_types = [ColumnSchema(semantic_tags={'numeric'})]
-    return_type = ColumnSchema(semantic_tags={'numeric'})
-    stack_on_self = False
+    if FEATURETOOLS_AVAILABLE:
+        input_types = [ColumnSchema(semantic_tags={'numeric'})]
+    if FEATURETOOLS_AVAILABLE:
+        return_type = ColumnSchema(semantic_tags={'numeric'})
+    if FEATURETOOLS_AVAILABLE:
+        stack_on_self = False
     
+    def __init__(self, window_size=5):
     def __init__(self, window_size=5):
         self.window_size = window_size
         super().__init__()
@@ -189,15 +230,19 @@ class RollingMeanPrimitive(AggregationPrimitive):
         return rolling_mean
 
 
-class EntropyPrimitive(AggregationPrimitive):
+class EntropyPrimitive:
     """
     Calculates Shannon entropy of categorical distribution.
     """
     name = "entropy"
-    input_types = [ColumnSchema(logical_type=Categorical)]
-    return_type = ColumnSchema(semantic_tags={'numeric'})
-    stack_on_self = False
+    if FEATURETOOLS_AVAILABLE:
+        input_types = [ColumnSchema(logical_type=Categorical)]
+    if FEATURETOOLS_AVAILABLE:
+        return_type = ColumnSchema(semantic_tags={'numeric'})
+    if FEATURETOOLS_AVAILABLE:
+        stack_on_self = False
     
+    def get_function(self):
     def get_function(self):
         def entropy(categories):
             if len(categories) == 0:
@@ -213,15 +258,19 @@ class EntropyPrimitive(AggregationPrimitive):
         return entropy_value
 
 
-class ModePrimitive(AggregationPrimitive):
+class ModePrimitive:
     """
     Returns the mode (most frequent value) of a categorical column.
     """
     name = "mode"
-    input_types = [ColumnSchema(logical_type=Categorical)]
-    return_type = ColumnSchema(logical_type=Categorical)
-    stack_on_self = False
+    if FEATURETOOLS_AVAILABLE:
+        input_types = [ColumnSchema(logical_type=Categorical)]
+    if FEATURETOOLS_AVAILABLE:
+        return_type = ColumnSchema(logical_type=Categorical)
+    if FEATURETOOLS_AVAILABLE:
+        stack_on_self = False
     
+    def get_function(self):
     def get_function(self):
         def mode_func(categories):
             if len(categories) == 0:
@@ -232,15 +281,19 @@ class ModePrimitive(AggregationPrimitive):
         return mode_func
 
 
-class SkewPrimitive(AggregationPrimitive):
+class SkewPrimitive:
     """
     Calculates skewness of numeric distribution.
     """
     name = "skew"
-    input_types = [ColumnSchema(semantic_tags={'numeric'})]
-    return_type = ColumnSchema(semantic_tags={'numeric'})
-    stack_on_self = False
+    if FEATURETOOLS_AVAILABLE:
+        input_types = [ColumnSchema(semantic_tags={'numeric'})]
+    if FEATURETOOLS_AVAILABLE:
+        return_type = ColumnSchema(semantic_tags={'numeric'})
+    if FEATURETOOLS_AVAILABLE:
+        stack_on_self = False
     
+    def get_function(self):
     def get_function(self):
         def skew_func(values):
             if len(values) < 3:
@@ -258,15 +311,19 @@ class SkewPrimitive(AggregationPrimitive):
         return skew_func
 
 
-class KurtosisPrimitive(AggregationPrimitive):
+class KurtosisPrimitive:
     """
     Calculates kurtosis of numeric distribution.
     """
     name = "kurtosis"
-    input_types = [ColumnSchema(semantic_tags={'numeric'})]
-    return_type = ColumnSchema(semantic_tags={'numeric'})
-    stack_on_self = False
+    if FEATURETOOLS_AVAILABLE:
+        input_types = [ColumnSchema(semantic_tags={'numeric'})]
+    if FEATURETOOLS_AVAILABLE:
+        return_type = ColumnSchema(semantic_tags={'numeric'})
+    if FEATURETOOLS_AVAILABLE:
+        stack_on_self = False
     
+    def get_function(self):
     def get_function(self):
         def kurtosis_func(values):
             if len(values) < 4:
