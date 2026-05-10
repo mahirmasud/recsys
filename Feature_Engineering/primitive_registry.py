@@ -43,7 +43,7 @@ class RecencyScorePrimitive:
             stack_on_self = False
     
     def __init__(self, reference_date=None):
-    def __init__(self, reference_date=None):
+
         self.reference_date = reference_date or pd.Timestamp.now()
         if FEATURETOOLS_AVAILABLE:
             super().__init__()
@@ -73,7 +73,6 @@ class FrequencyScorePrimitive:
         stack_on_self = False
     
     def get_function(self):
-    def get_function(self):
         def frequency_score(values):
             if len(values) == 0:
                 return 0.0
@@ -95,7 +94,6 @@ class TrendVelocityPrimitive:
     if FEATURETOOLS_AVAILABLE:
         stack_on_self = False
     
-    def get_function(self):
     def get_function(self):
         def trend_velocity(values, timestamps):
             if len(values) < 2 or len(timestamps) < 2:
@@ -132,7 +130,6 @@ class EntityAffinityPrimitive:
         stack_on_self = False
     
     def get_function(self):
-    def get_function(self):
         def entity_affinity(categories):
             if len(categories) == 0:
                 return 0.0
@@ -167,7 +164,6 @@ class InteractionDensityPrimitive:
         stack_on_self = False
     
     def get_function(self):
-    def get_function(self):
         def interaction_density(timestamps):
             if len(timestamps) < 2:
                 return float(len(timestamps))
@@ -194,7 +190,6 @@ class PercentileRankPrimitive:
         stack_on_self = False
     
     def get_function(self):
-    def get_function(self):
         def percentile_rank(values):
             if len(values) == 0:
                 return pd.Series([], dtype=float)
@@ -216,7 +211,6 @@ class RollingMeanPrimitive:
     if FEATURETOOLS_AVAILABLE:
         stack_on_self = False
     
-    def __init__(self, window_size=5):
     def __init__(self, window_size=5):
         self.window_size = window_size
         super().__init__()
@@ -242,7 +236,6 @@ class EntropyPrimitive:
     if FEATURETOOLS_AVAILABLE:
         stack_on_self = False
     
-    def get_function(self):
     def get_function(self):
         def entropy(categories):
             if len(categories) == 0:
@@ -271,7 +264,6 @@ class ModePrimitive:
         stack_on_self = False
     
     def get_function(self):
-    def get_function(self):
         def mode_func(categories):
             if len(categories) == 0:
                 return None
@@ -293,7 +285,6 @@ class SkewPrimitive:
     if FEATURETOOLS_AVAILABLE:
         stack_on_self = False
     
-    def get_function(self):
     def get_function(self):
         def skew_func(values):
             if len(values) < 3:
@@ -323,7 +314,6 @@ class KurtosisPrimitive:
     if FEATURETOOLS_AVAILABLE:
         stack_on_self = False
     
-    def get_function(self):
     def get_function(self):
         def kurtosis_func(values):
             if len(values) < 4:
